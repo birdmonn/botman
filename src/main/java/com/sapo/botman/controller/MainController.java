@@ -42,6 +42,11 @@ public class MainController {
     public void handleStickerMessage(MessageEvent<StickerMessageContent> event) {
 //        log.info(event.toString());
         StickerMessageContent message = event.getMessage();
+        if(ConfigGroup.GROUPID .equals(event.getSource().getSenderId())){
+            List<Message> sdsd = null;
+            new ReplyMessage(event.getReplyToken(),Arrays.asList(
+                    new TextMessage("Display name: ")));
+        }
         reply(event.getReplyToken(), new StickerMessage(
                 message.getPackageId(), message.getStickerId()
         ));
