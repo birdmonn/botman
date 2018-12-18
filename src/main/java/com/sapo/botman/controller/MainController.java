@@ -31,6 +31,7 @@ public class MainController {
 //        log.info(event.toString());
         System.out.print("event Stick :" + event.toString());
         System.out.print("Source :" + event.getSource().toString());
+        System.out.print("Sender :" + event.getSource().getSenderId());
 
         TextMessageContent message = event.getMessage();
         handleTextContent(event.getReplyToken(), event, message);
