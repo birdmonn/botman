@@ -15,6 +15,7 @@ import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.xml.transform.Source;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +29,9 @@ public class MainController {
     @EventMapping
     public void handleTextMessage(MessageEvent<TextMessageContent> event) {
 //        log.info(event.toString());
+        System.out.print("event Stick :" + event.toString());
+        System.out.print("Source :" + event.getSource().toString());
+
         TextMessageContent message = event.getMessage();
         handleTextContent(event.getReplyToken(), event, message);
     }
@@ -36,7 +40,6 @@ public class MainController {
     @EventMapping
     public void handleStickerMessage(MessageEvent<StickerMessageContent> event) {
 //        log.info(event.toString());
-        System.out.print("event Stick :" + event.toString());
         StickerMessageContent message = event.getMessage();
         reply(event.getReplyToken(), new StickerMessage(
                 message.getPackageId(), message.getStickerId()
