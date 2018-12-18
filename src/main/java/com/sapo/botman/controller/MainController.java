@@ -49,9 +49,9 @@ public class MainController {
             new ReplyMessage(event.getReplyToken(),Arrays.asList(
                     new TextMessage("Display name: ")));
         } else {
-            reply(event.getReplyToken(), new StickerMessage(
-                    message.getPackageId(), message.getStickerId()
-            ));
+//            reply(event.getReplyToken(), new StickerMessage(
+//                    message.getPackageId(), message.getStickerId()
+//            ));
         }
     }
 
