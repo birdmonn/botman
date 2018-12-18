@@ -27,5 +27,14 @@ repositories {
 dependencies {
 	implementation('org.springframework.boot:spring-boot-starter')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
-	compile 'com.linecorp.bot:line-bot-spring-boot:1.20.0'
+	// https://mvnrepository.com/artifact/com.linecorp.bot/line-bot-spring-boot
+	compile group: 'com.linecorp.bot', name: 'line-bot-spring-boot', version: '2.3.0'
+	// https://mvnrepository.com/artifact/com.linecorp.bot/line-bot-api-client
+	compile group: 'com.linecorp.bot', name: 'line-bot-api-client', version: '2.3.0'
+	// https://mvnrepository.com/artifact/com.linecorp.bot/line-bot-servlet
+	compile group: 'com.linecorp.bot', name: 'line-bot-servlet', version: '2.3.0'
+	// https://mvnrepository.com/artifact/com.linecorp.bot/line-bot-model
+	compile group: 'com.linecorp.bot', name: 'line-bot-model', version: '2.3.0'
+	// https://mvnrepository.com/artifact/com.linecorp.bot/line-bot-cli
+	compile group: 'com.linecorp.bot', name: 'line-bot-cli', version: '2.3.0'
 }
