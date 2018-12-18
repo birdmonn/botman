@@ -22,6 +22,7 @@ line.bot:
   channel-secret: 'd7abd973c8f685503a83fe3af9ec8e85'
   handler.path: /callback
 
+
 # To remove Client wire logs. Please comment out following lines.
 # See: https://docs.spring.io/spring-boot/docs/current/reference/html/howto-logging.html
 #
