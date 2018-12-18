@@ -3,10 +3,12 @@ package com.sapo.botman.controller;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.event.Event;
+import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.response.BotApiResponse;
+import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,13 @@ public class MainController {
     @Autowired
     private LineMessagingClient lineMessagingClient;
 
+    @EventMapping
+    public void handleTextMessage(MessageEvent<TextMessageContent> event) {
+//        log.info(event.toString());
+        TextMessageContent message = event.getMessage();
+        handleTextContent(event.getReplyToken(), event, message);
+    }
+    
     private void handleTextContent(String replyToken, Event event, TextMessageContent content) {
         String text = content.getText();
 
