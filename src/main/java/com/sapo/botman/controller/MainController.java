@@ -46,8 +46,8 @@ public class MainController {
         System.out.println("user :" + event.getSource().getUserId());
         if(event.getSource().getSenderId().equals("C7d15a9de7636d04416f38635c9ffc8da")){
             List<Message> sdsd = null;
-            new ReplyMessage(event.getReplyToken(),Arrays.asList(
-                    new TextMessage("Display name: ")));
+            System.out.println("abc");
+  
         } else {
 //            reply(event.getReplyToken(), new StickerMessage(
 //                    message.getPackageId(), message.getStickerId()
