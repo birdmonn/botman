@@ -16,8 +16,6 @@
 #This is tempalte file for configuration.
 #Please copy as `application.yml` and change your value.
 
-logging.level.org.springframework.web=DEBUG
-logging.level.org.hibernate=ERROR
 
 line.bot:
   channel-token: 'UZdf2fqdRzftRVQgkQtxHykgIWvgZiIohrkKV0pzaT5FdFqiKg2HCAoXGVamU5Ze+vGrOksfskHM3oOvxdFzg0aYDIxZ28A2Z1CvSOtls//lLJBq8UwSjrwDFhmQ9uiyA3zXiu4ZvhZU/xi5lnHS/wdB04t89/1O/w1cDnyilFU='
