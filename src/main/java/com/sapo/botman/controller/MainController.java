@@ -44,7 +44,7 @@ public class MainController {
         StickerMessageContent message = event.getMessage();
         System.out.println("Sender :" + event.getSource().getSenderId());
         System.out.println("user :" + event.getSource().getUserId());
-        if(ConfigGroup.GROUPID.equals(event.getSource().getSenderId())){
+        if(event.getSource().getSenderId().equals("C7d15a9de7636d04416f38635c9ffc8da")){
             List<Message> sdsd = null;
             new ReplyMessage(event.getReplyToken(),Arrays.asList(
                     new TextMessage("Display name: ")));
