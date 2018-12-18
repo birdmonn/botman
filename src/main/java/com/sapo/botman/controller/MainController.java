@@ -42,6 +42,8 @@ public class MainController {
     public void handleStickerMessage(MessageEvent<StickerMessageContent> event) {
 //        log.info(event.toString());
         StickerMessageContent message = event.getMessage();
+        System.out.println("Sender :" + event.getSource().getSenderId());
+        System.out.println("user :" + event.getSource().getUserId());
         if(ConfigGroup.GROUPID.equals(event.getSource().getSenderId())){
             List<Message> sdsd = null;
             new ReplyMessage(event.getReplyToken(),Arrays.asList(
