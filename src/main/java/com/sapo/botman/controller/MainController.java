@@ -36,6 +36,7 @@ public class MainController {
     @EventMapping
     public void handleStickerMessage(MessageEvent<StickerMessageContent> event) {
 //        log.info(event.toString());
+        System.out.print("event Stick :" + event.toString());
         StickerMessageContent message = event.getMessage();
         reply(event.getReplyToken(), new StickerMessage(
                 message.getPackageId(), message.getStickerId()
