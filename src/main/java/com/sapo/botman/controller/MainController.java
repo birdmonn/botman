@@ -12,10 +12,10 @@ import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
+import com.sapo.botman.config.ConfigGroup;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.xml.transform.Source;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -29,10 +29,10 @@ public class MainController {
     @EventMapping
     public void handleTextMessage(MessageEvent<TextMessageContent> event) {
 //        log.info(event.toString());
-        System.out.print("event Stick :" + event.toString());
-        System.out.print("Source :" + event.getSource().toString());
-        System.out.print("Sender :" + event.getSource().getSenderId());
-
+        System.out.println("event Stick :" + event.toString());
+        System.out.println("Source :" + event.getSource().toString());
+        System.out.println("Sender :" + event.getSource().getSenderId());
+        System.out.println("user :" + event.getSource().getUserId());
         TextMessageContent message = event.getMessage();
         handleTextContent(event.getReplyToken(), event, message);
     }
