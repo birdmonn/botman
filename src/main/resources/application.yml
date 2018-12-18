@@ -19,7 +19,7 @@
 
 line.bot:
   channel-token: 'UZdf2fqdRzftRVQgkQtxHykgIWvgZiIohrkKV0pzaT5FdFqiKg2HCAoXGVamU5Ze+vGrOksfskHM3oOvxdFzg0aYDIxZ28A2Z1CvSOtls//lLJBq8UwSjrwDFhmQ9uiyA3zXiu4ZvhZU/xi5lnHS/wdB04t89/1O/w1cDnyilFU='
-  channel-secret: 'd7abd973c8f685503a83fe3af9ec8e85l'
+  channel-secret: 'd7abd973c8f685503a83fe3af9ec8e85'
   handler.path: /callback
 
 # To remove Client wire logs. Please comment out following lines.
