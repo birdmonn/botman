@@ -42,21 +42,10 @@ public class MainController {
     public void handleStickerMessage(MessageEvent<StickerMessageContent> event) {
 //        log.info(event.toString());
         StickerMessageContent message = event.getMessage();
-        System.out.println("Sender :" + event.getSource().getSenderId());
-        System.out.println("user :" + event.getSource().getUserId());
-        if(event.getSource().getSenderId().equals("C7d15a9de7636d04416f38635c9ffc8da")){
-            List<Message> sdsd = null;
-            System.out.println("abc");
-            this.reply(event.getReplyToken(), Arrays.asList(
-                    new TextMessage("Display name: "),
-                    new TextMessage("Status message: "),
-                    new TextMessage("User ID: ")
+        if(!event.getSource().getSenderId().equals(ConfigGroup.GROUPID)){
+            reply(event.getReplyToken(), new StickerMessage(
+                    message.getPackageId(), message.getStickerId()
             ));
-
-        } else {
-//            reply(event.getReplyToken(), new StickerMessage(
-//                    message.getPackageId(), message.getStickerId()
-//            ));
         }
     }
 
