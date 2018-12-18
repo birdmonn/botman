@@ -48,10 +48,11 @@ public class MainController {
             List<Message> sdsd = null;
             new ReplyMessage(event.getReplyToken(),Arrays.asList(
                     new TextMessage("Display name: ")));
+        } else {
+            reply(event.getReplyToken(), new StickerMessage(
+                    message.getPackageId(), message.getStickerId()
+            ));
         }
-        reply(event.getReplyToken(), new StickerMessage(
-                message.getPackageId(), message.getStickerId()
-        ));
     }
 
     private void handleTextContent(String replyToken, Event event, TextMessageContent content) {
