@@ -170,7 +170,7 @@ public class MainController {
     private QuestPokemonGo saveContent(String ext,
                                        MessageContentResponse response) {
         QuestPokemonGo tempFile = createTempFile(ext);
-        try (OutputStream outputStream = Files.newOutputStream(tempFile.getPath())) {
+        try (OutputStream outputStream = Files.newOutputStream(Paths.get(tempFile.getPath()))) {
             ByteStreams.copy(response.getStream(), outputStream);
             return tempFile;
         } catch (IOException e) {
@@ -184,7 +184,7 @@ public class MainController {
                 + "." + ext;
         Path tempFile = Paths.get(properties.getLocation() + fileName);
         tempFile.toFile().deleteOnExit();
-        return new QuestPokemonGo(tempFile,
+        return new QuestPokemonGo(tempFile.toString(),
                 createUri("/downloads/" + tempFile.getFileName()));
     }
 

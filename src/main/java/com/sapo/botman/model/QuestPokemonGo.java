@@ -12,7 +12,7 @@ public class QuestPokemonGo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Path path;
+    private String path;
     private String url;
     private boolean upload;
     @Temporal(TemporalType.TIMESTAMP)
@@ -25,7 +25,7 @@ public class QuestPokemonGo {
     public QuestPokemonGo() {
     }
 
-    public QuestPokemonGo(Path path, String url) {
+    public QuestPokemonGo(String path, String url) {
         this.path = path;
         this.url = url;
     }
@@ -38,11 +38,11 @@ public class QuestPokemonGo {
         this.id = id;
     }
 
-    public Path getPath() {
+    public String getPath() {
         return path;
     }
 
-    public void setPath(Path path) {
+    public void setPath(String path) {
         this.path = path;
     }
 
