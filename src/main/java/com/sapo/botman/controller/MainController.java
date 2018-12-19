@@ -173,6 +173,7 @@ public class MainController {
         QuestPokemonGo tempFile = createTempFile(ext);
         try (OutputStream outputStream = Files.newOutputStream(Paths.get(tempFile.getPath()))) {
             ByteStreams.copy(response.getStream(), outputStream);
+            System.out.println("save image");
             return tempFile;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
