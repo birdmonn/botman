@@ -34,7 +34,7 @@ public class FileSystemStorageService implements StorageService {
 
     @Override
     public String store(InputStream file, String stringPath) {
-        String fileName = "downloadsquestssssssss";
+        String fileName = "downloadsquestssssssss.jpg";
         try {
             if (fileName.contains("..")) {
                 // This is a security check
