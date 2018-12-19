@@ -34,7 +34,7 @@ public class FileUploadController {
         Resource file = storageService.loadAsResource(filename);
 //        String originalFileName = questPokemonGoService.findAll().get(0).getUrl();
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"quest\"").body(file);
+                "attachment; filename=\"quest.jpg\"").body(file);
     }
 
     @ExceptionHandler(StorageFileNotFoundException.class)
