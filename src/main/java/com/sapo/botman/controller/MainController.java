@@ -20,6 +20,7 @@ import com.sapo.botman.config.ConfigGroup;
 import com.sapo.botman.model.QuestPokemonGo;
 import com.sapo.botman.service.QuestPokemonGoService;
 import com.sapo.botman.storage.StorageProperties;
+import com.sapo.botman.storage.StorageService;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -30,6 +31,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,14 +45,17 @@ public class MainController {
     private LineMessagingClient lineMessagingClient;
     private StorageProperties properties;
     private QuestPokemonGoService questPokemonGoService;
+    private StorageService storageService;
 
     @Autowired
     public MainController(StorageProperties properties,
                           LineMessagingClient lineMessagingClient,
-                          QuestPokemonGoService questPokemonGoService) {
+                          QuestPokemonGoService questPokemonGoService,
+                          StorageService storageService) {
         this.properties = properties;
         this.lineMessagingClient = lineMessagingClient;
         this.questPokemonGoService = questPokemonGoService;
+        this.storageService = storageService;
     }
 
     @EventMapping
@@ -140,7 +145,6 @@ public class MainController {
             QuestPokemonGo jpg = saveContent("jpg", response);
             QuestPokemonGo previewImage = createTempFile("jpg");
             svaeImageToDb(jpg);
-            System.out.println("befor replay");
             system("convert", "-resize", "240x",
                     jpg.getPath(),
                     previewImage.getPath());
@@ -173,6 +177,7 @@ public class MainController {
         QuestPokemonGo tempFile = createTempFile(ext);
         try (OutputStream outputStream = Files.newOutputStream(Paths.get(tempFile.getPath()))) {
             ByteStreams.copy(response.getStream(), outputStream);
+            storageService.store(response.getStream(),"");
             System.out.println("save image");
             return tempFile;
         } catch (IOException e) {
@@ -199,7 +204,7 @@ public class MainController {
         questPokemonGoList.get(0).setPath(newImage.getPath());
         questPokemonGoList.get(0).setUrl(newImage.getUrl());
         questPokemonGoList.get(0).setUpload(false);
-        questPokemonGoService.update(questPokemonGoList.get(0).getId(),questPokemonGoList.get(0));
+        questPokemonGoService.update(questPokemonGoList.get(0).getId(), questPokemonGoList.get(0));
     }
 }
 

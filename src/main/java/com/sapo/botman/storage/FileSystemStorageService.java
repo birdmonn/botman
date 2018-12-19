@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,21 +33,17 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public String store(MultipartFile file, String stringPath) {
-        String fileName = String.valueOf(new Date().getTime()) + "."
-                + com.google.common.io.Files.getFileExtension(StringUtils.cleanPath(file.getOriginalFilename()));
+    public String store(InputStream file, String stringPath) {
+        String fileName = "downloadsquest";
         try {
-            if (file.isEmpty()) {
-                throw new StorageException(MessageUtils.FAILED_TO_STORE_FILE + fileName);
-            }
             if (fileName.contains("..")) {
                 // This is a security check
                 throw new StorageException(MessageUtils.CANNOT_STORE_FILE
                         + fileName);
             }
-            Path customPath = Paths.get(properties.getLocationReport() + stringPath);
+            Path customPath = Paths.get(properties.getLocation());
             Files.createDirectories(customPath);
-            Files.copy(file.getInputStream(), customPath.resolve(fileName),
+            Files.copy(file, customPath.resolve(fileName),
                     StandardCopyOption.REPLACE_EXISTING);
             return "/" + properties.getLocationReport() + stringPath + fileName;
         } catch (IOException e) {
