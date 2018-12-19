@@ -1,7 +1,6 @@
 package com.sapo.botman.controller;
 
 import com.google.common.io.ByteStreams;
-import com.linecorp.bot.cli.Application;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.client.MessageContentResponse;
 import com.linecorp.bot.model.ReplyMessage;
@@ -18,6 +17,9 @@ import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import com.sapo.botman.config.ConfigGroup;
+import com.sapo.botman.model.QuestPokemonGo;
+import com.sapo.botman.service.QuestPokemonGoService;
+import com.sapo.botman.storage.StorageProperties;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -27,6 +29,7 @@ import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,8 +39,19 @@ import java.util.concurrent.ExecutionException;
 
 @LineMessageHandler
 public class MainController {
-    @Autowired
+
     private LineMessagingClient lineMessagingClient;
+    private StorageProperties properties;
+    private QuestPokemonGoService questPokemonGoService;
+
+    @Autowired
+    public MainController(StorageProperties properties,
+                          LineMessagingClient lineMessagingClient,
+                          QuestPokemonGoService questPokemonGoService) {
+        this.properties = properties;
+        this.lineMessagingClient = lineMessagingClient;
+        this.questPokemonGoService = questPokemonGoService;
+    }
 
     @EventMapping
     public void handleTextMessage(MessageEvent<TextMessageContent> event) {
@@ -53,9 +67,8 @@ public class MainController {
 
     @EventMapping
     public void handleStickerMessage(MessageEvent<StickerMessageContent> event) {
-//        log.info(event.toString());
         StickerMessageContent message = event.getMessage();
-        if(!event.getSource().getSenderId().equals(ConfigGroup.GROUPID)){
+        if (!event.getSource().getSenderId().equals(ConfigGroup.GROUPID)) {
             reply(event.getReplyToken(), new StickerMessage(
                     message.getPackageId(), message.getStickerId()
             ));
@@ -64,15 +77,11 @@ public class MainController {
 
     private void handleTextContent(String replyToken, Event event, TextMessageContent content) {
         String text = content.getText();
-
-//        log.info("Got text message from %s : %s", replyToken, text);
-
         switch (text) {
             case "Profile":
                 showProfile(replyToken, event);
                 break;
             default:
-//                log.info("Return echo message %s : %s", replyToken, text);
                 this.replyText(replyToken, text);
         }
     }
@@ -81,7 +90,6 @@ public class MainController {
         if (replyToken.isEmpty()) {
             throw new IllegalArgumentException("replyToken is not empty");
         }
-
         if (message.length() > 1000) {
             message = message.substring(0, 1000 - 2) + "...";
         }
@@ -129,14 +137,14 @@ public class MainController {
         try {
             MessageContentResponse response = lineMessagingClient.getMessageContent(
                     content.getId()).get();
-            DownloadedContent jpg = saveContent("jpg", response);
-            DownloadedContent previewImage = createTempFile("jpg");
-
+            QuestPokemonGo jpg = saveContent("jpg", response);
+            QuestPokemonGo previewImage = createTempFile("jpg");
+            svaeImgaeToDb(jpg);
             system("convert", "-resize", "240x",
-                    jpg.path.toString(),
-                    previewImage.path.toString());
+                    jpg.getPath().toString(),
+                    previewImage.getPath().toString());
 
-            reply(replyToken, new ImageMessage(jpg.getUri(), previewImage.getUri()));
+            reply(replyToken, new ImageMessage(jpg.getUrl(), previewImage.getUrl()));
 
         } catch (InterruptedException | ExecutionException e) {
             reply(replyToken, new TextMessage("Cannot get image: " + content));
@@ -159,28 +167,25 @@ public class MainController {
         }
     }
 
-    private static DownloadedContent saveContent(String ext,
-                                                 MessageContentResponse response) {
-//        log.info("Content-type: {}", response);
-        DownloadedContent tempFile = createTempFile(ext);
-        try (OutputStream outputStream = Files.newOutputStream(tempFile.path)) {
+    private QuestPokemonGo saveContent(String ext,
+                                       MessageContentResponse response) {
+        QuestPokemonGo tempFile = createTempFile(ext);
+        try (OutputStream outputStream = Files.newOutputStream(tempFile.getPath())) {
             ByteStreams.copy(response.getStream(), outputStream);
-//            log.info("Save {}: {}", ext, tempFile);
             return tempFile;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    private static DownloadedContent createTempFile(String ext) {
+    private QuestPokemonGo createTempFile(String ext) {
         String fileName = LocalDateTime.now() + "-"
                 + UUID.randomUUID().toString()
                 + "." + ext;
-        Path tempFile = Application.downloadedContentDir.resolve(fileName);
+        Path tempFile = Paths.get(properties.getLocation() + fileName);
         tempFile.toFile().deleteOnExit();
-        return new DownloadedContent(tempFile,
-                createUri("/downloaded/" + tempFile.getFileName()));
-
+        return new QuestPokemonGo(tempFile,
+                createUri("/downloads/" + tempFile.getFileName()));
     }
 
     private static String createUri(String path) {
@@ -188,8 +193,11 @@ public class MainController {
                 .path(path).toUriString();
     }
 
-    public static class DownloadedContent {
-        Path path;
-        String uri;
+    private void svaeImgaeToDb(QuestPokemonGo newImage) {
+        List<QuestPokemonGo> questPokemonGoList = questPokemonGoService.findAll();
+        questPokemonGoList.get(0).setPath(newImage.getPath());
+        questPokemonGoList.get(0).setUrl(newImage.getUrl());
+        questPokemonGoList.get(0).setUpload(false);
     }
 }
+

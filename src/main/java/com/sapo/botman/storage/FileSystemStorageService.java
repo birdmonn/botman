@@ -1,7 +1,7 @@
 package com.sapo.botman.storage;
 
-import com.adss.rif.utils.MessageUtils;
-import com.adss.rif.utils.SplitString;
+import com.sapo.botman.utils.MessageUtils;
+import com.sapo.botman.utils.SplitString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
