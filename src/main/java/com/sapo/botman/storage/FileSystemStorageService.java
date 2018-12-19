@@ -45,6 +45,7 @@ public class FileSystemStorageService implements StorageService {
             Files.createDirectories(customPath);
             Files.copy(file, customPath.resolve(fileName),
                     StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("in store");
             return "/" + properties.getLocationReport() + stringPath + fileName;
         } catch (IOException e) {
             throw new StorageException(MessageUtils.FAILED_TO_STORE_FILE + fileName, e);
