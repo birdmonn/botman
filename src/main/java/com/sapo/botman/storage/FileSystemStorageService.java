@@ -67,16 +67,15 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public Path load(String pathId, String filename) {
-
-        Path customPath = Paths.get(properties.getLocationReport() + "/" + pathId);
+    public Path load(String filename) {
+        Path customPath = Paths.get(properties.getLocation());
         return customPath.resolve(filename);
     }
 
     @Override
-    public Resource loadAsResource(String pathId, String fileName) {
+    public Resource loadAsResource(String fileName) {
         try {
-            Path file = load(pathId, fileName);
+            Path file = load(fileName);
             Resource resource = new UrlResource(file.toUri());
             if (resource.exists() || resource.isReadable()) {
                 return resource;
