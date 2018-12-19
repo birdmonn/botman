@@ -139,10 +139,11 @@ public class MainController {
                     content.getId()).get();
             QuestPokemonGo jpg = saveContent("jpg", response);
             QuestPokemonGo previewImage = createTempFile("jpg");
-            svaeImgaeToDb(jpg);
+            svaeImageToDb(jpg);
+            System.out.println("befor replay");
             system("convert", "-resize", "240x",
-                    jpg.getPath().toString(),
-                    previewImage.getPath().toString());
+                    jpg.getPath(),
+                    previewImage.getPath());
 
             reply(replyToken, new ImageMessage(jpg.getUrl(), previewImage.getUrl()));
 
@@ -179,8 +180,7 @@ public class MainController {
     }
 
     private QuestPokemonGo createTempFile(String ext) {
-        String fileName = LocalDateTime.now() + "-"
-                + UUID.randomUUID().toString()
+        String fileName = "quest"
                 + "." + ext;
         Path tempFile = Paths.get(properties.getLocation() + fileName);
         tempFile.toFile().deleteOnExit();
@@ -193,11 +193,12 @@ public class MainController {
                 .path(path).toUriString();
     }
 
-    private void svaeImgaeToDb(QuestPokemonGo newImage) {
+    private void svaeImageToDb(QuestPokemonGo newImage) {
         List<QuestPokemonGo> questPokemonGoList = questPokemonGoService.findAll();
         questPokemonGoList.get(0).setPath(newImage.getPath());
         questPokemonGoList.get(0).setUrl(newImage.getUrl());
         questPokemonGoList.get(0).setUpload(false);
+        questPokemonGoService.update(questPokemonGoList.get(0).getId(),questPokemonGoList.get(0));
     }
 }
 
