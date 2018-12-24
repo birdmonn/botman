@@ -189,7 +189,7 @@ public class MainController {
         String fileName = "downloadsquest"
                 + "." + ext;
         Path tempFile = Paths.get(properties.getLocation());
-        tempFile.toFile().deleteOnExit();
+//        tempFile.toFile().deleteOnExit();
         return new QuestPokemonGo(tempFile.toString(),
                 createUri("/downloads/" + tempFile.getFileName()));
     }
