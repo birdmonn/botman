@@ -186,7 +186,7 @@ public class MainController {
     }
 
     private QuestPokemonGo createTempFile(String ext) {
-        String fileName = "quest"
+        String fileName = "downloadsquest"
                 + "." + ext;
         Path tempFile = Paths.get(properties.getLocation());
         tempFile.toFile().deleteOnExit();
