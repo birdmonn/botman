@@ -34,7 +34,7 @@ public class FileSystemStorageService implements StorageService {
 
     @Override
     public String store(InputStream file, String stringPath) {
-        String fileName = "downloadsquestssssssss.jpg";
+        String fileName = "downloadsquest.jpg";
         try {
             if (fileName.contains("..")) {
                 // This is a security check
@@ -42,7 +42,7 @@ public class FileSystemStorageService implements StorageService {
                         + fileName);
             }
             Path customPath = Paths.get(properties.getLocation());
-            Files.createDirectories(customPath);
+//            Files.createDirectories(customPath);
             Files.copy(file, customPath.resolve(fileName),
                     StandardCopyOption.REPLACE_EXISTING);
             System.out.println("in store");
