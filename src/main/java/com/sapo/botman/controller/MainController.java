@@ -144,12 +144,12 @@ public class MainController {
                     content.getId()).get();
             QuestPokemonGo jpg = saveContent("jpg", response);
             QuestPokemonGo previewImage = createTempFile("jpg");
-            svaeImageToDb(jpg);
+            saveImageToDb(jpg);
             system("convert", "-resize", "240x",
                     jpg.getPath(),
                     previewImage.getPath());
 
-            reply(replyToken, new ImageMessage(jpg.getUrl(), previewImage.getUrl()));
+            reply(replyToken, new ImageMessage(jpg.getUrl(), jpg.getUrl()));
 
         } catch (InterruptedException | ExecutionException e) {
             reply(replyToken, new TextMessage("Cannot get image: " + content));
@@ -199,7 +199,7 @@ public class MainController {
                 .path(path).toUriString();
     }
 
-    private void svaeImageToDb(QuestPokemonGo newImage) {
+    private void saveImageToDb(QuestPokemonGo newImage) {
         List<QuestPokemonGo> questPokemonGoList = questPokemonGoService.findAll();
         questPokemonGoList.get(0).setPath(newImage.getPath());
         questPokemonGoList.get(0).setUrl(newImage.getUrl());
