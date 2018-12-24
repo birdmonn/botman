@@ -149,7 +149,7 @@ public class MainController {
                     jpg.getPath(),
                     previewImage.getPath());
 
-            reply(replyToken, new ImageMessage(jpg.getUrl(), jpg.getUrl()));
+            reply(replyToken, new ImageMessage(jpg.getUrl(), previewImage.getUrl()));
 
         } catch (InterruptedException | ExecutionException e) {
             reply(replyToken, new TextMessage("Cannot get image: " + content));
