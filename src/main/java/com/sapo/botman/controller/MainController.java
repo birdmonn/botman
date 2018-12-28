@@ -96,20 +96,15 @@ public class MainController {
 
     private void showQuestPokemon(String replyToken) {
         QuestPokemonGo questPokemonGo = questPokemonGoService.findAll().get(0);
-        try {
-            QuestPokemonGo jpg = saveContent(questPokemonGo, response);
-            QuestPokemonGo previewImage = createTempFile("jpg");
-            system("convert", "-resize", "240x",
-                    jpg.getPath(),
-                    previewImage.getPath());
-            System.out.println("url : " + questPokemonGo.getUrl());
+        QuestPokemonGo jpg = saveContent(questPokemonGo);
+        QuestPokemonGo previewImage = createTempFile(questPokemonGo);
+        system("convert", "-resize", "240x",
+                jpg.getPath(),
+                previewImage.getPath());
+        System.out.println("url : " + questPokemonGo.getUrl());
         System.out.println("Path : " + questPokemonGo.getPath());
-            new ReplayController(lineMessagingClient).reply(replyToken, new ImageMessage(questPokemonGo.getUrl(), questPokemonGo.getUrl()));
+        new ReplayController(lineMessagingClient).reply(replyToken, new ImageMessage(questPokemonGo.getUrl(), questPokemonGo.getUrl()));
 
-        } catch (InterruptedException | ExecutionException e) {
-            new ReplayController(lineMessagingClient).reply(replyToken, new TextMessage("Cannot get image"));
-            throw new RuntimeException(e);
-        }
     }
     private void system(String... args) {
         ProcessBuilder processBuilder = new ProcessBuilder(args);
