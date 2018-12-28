@@ -93,17 +93,21 @@ public class MainController {
     }
 
     private void showQuestPokemon(String replyToken) {
-        QuestPokemonGo questPokemonGo = questPokemonGoService.findAll().get(0);
-        QuestPokemonGo jpg = saveContent(questPokemonGo);
-        QuestPokemonGo previewImage = createTempFile(questPokemonGo);
-        system("convert", "-resize", "240x",
-                jpg.getPath(),
-                previewImage.getPath());
-        System.out.println("url : " + questPokemonGo.getUrl());
-        System.out.println("Path : " + questPokemonGo.getPath());
-        new ReplayController(lineMessagingClient).reply(replyToken, new ImageMessage(questPokemonGo.getUrl(), questPokemonGo.getUrl()));
-
+        try {
+            QuestPokemonGo questPokemonGo = questPokemonGoService.findAll().get(0);
+            QuestPokemonGo jpg = saveContent(questPokemonGo);
+            QuestPokemonGo previewImage = createTempFile(questPokemonGo);
+            system("convert", "-resize", "240x",
+                    jpg.getPath(),
+                    previewImage.getPath());
+            System.out.println("url : " + questPokemonGo.getUrl());
+            System.out.println("Path : " + questPokemonGo.getPath());
+            new ReplayController(lineMessagingClient).reply(replyToken, new ImageMessage(questPokemonGo.getUrl(), questPokemonGo.getUrl()));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
+
     private void system(String... args) {
         ProcessBuilder processBuilder = new ProcessBuilder(args);
         try {
@@ -115,7 +119,8 @@ public class MainController {
             throw new UncheckedIOException(e);
         }
     }
-//
+
+    //
     private static QuestPokemonGo saveContent(QuestPokemonGo questPokemonGo) throws FileNotFoundException {
         QuestPokemonGo tempFile = createTempFile(questPokemonGo);
         try (OutputStream outputStream = Files.newOutputStream(Paths.get(questPokemonGo.getPath()))) {
@@ -126,14 +131,16 @@ public class MainController {
             throw new UncheckedIOException(e);
         }
     }
-//
+
+    //
     private static QuestPokemonGo createTempFile(QuestPokemonGo questPokemonGo) {
         Path tempFile = Paths.get(questPokemonGo.getPath());
         tempFile.toFile().deleteOnExit();
         return new QuestPokemonGo(tempFile.toString(), createUri(questPokemonGo.getPath()));
 
     }
-//
+
+    //
     private static String createUri(String path) {
         return ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(path).toUriString();
