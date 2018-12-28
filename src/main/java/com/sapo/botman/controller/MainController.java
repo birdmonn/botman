@@ -1,43 +1,41 @@
 package com.sapo.botman.controller;
 
 import com.google.common.io.ByteStreams;
-import com.linecorp.bot.cli.Application;
 import com.linecorp.bot.client.LineMessagingClient;
-import com.linecorp.bot.client.MessageContentResponse;
-import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
-import com.linecorp.bot.model.event.message.ImageMessageContent;
-import com.linecorp.bot.model.event.message.StickerMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.ImageMessage;
-import com.linecorp.bot.model.message.Message;
-import com.linecorp.bot.model.message.StickerMessage;
 import com.linecorp.bot.model.message.TextMessage;
-import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
-import com.sapo.botman.config.ConfigGroup;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import com.sapo.botman.model.QuestPokemonGo;
+import com.sapo.botman.service.QuestPokemonGoService;
+import com.sapo.botman.storage.StorageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
+import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 @LineMessageHandler
 public class MainController {
-    @Autowired
+
+    private static StorageProperties properties;
     private LineMessagingClient lineMessagingClient;
+    private QuestPokemonGoService questPokemonGoService;
+
+    @Autowired
+    public MainController(LineMessagingClient lineMessagingClient,
+                          StorageProperties properties,
+                          QuestPokemonGoService questPokemonGoService) {
+        this.lineMessagingClient = lineMessagingClient;
+        this.questPokemonGoService = questPokemonGoService;
+        this.properties = properties;
+    }
 
     @EventMapping
     public void handleTextMessage(MessageEvent<TextMessageContent> event) {
@@ -50,57 +48,23 @@ public class MainController {
         handleTextContent(event.getReplyToken(), event, message);
     }
 
-
-    @EventMapping
-    public void handleStickerMessage(MessageEvent<StickerMessageContent> event) {
-//        log.info(event.toString());
-        StickerMessageContent message = event.getMessage();
-        if(!event.getSource().getSenderId().equals(ConfigGroup.GROUPID)){
-            reply(event.getReplyToken(), new StickerMessage(
-                    message.getPackageId(), message.getStickerId()
-            ));
-        }
-    }
-
     private void handleTextContent(String replyToken, Event event, TextMessageContent content) {
         String text = content.getText();
-
-//        log.info("Got text message from %s : %s", replyToken, text);
-
         switch (text) {
             case "Profile":
                 showProfile(replyToken, event);
                 break;
+            case "#quest":
+                showQuestPokemon(replyToken);
+                break;
+            case "#quest2":
+                new ReplayController(lineMessagingClient).reply(replyToken, new ImageMessage("asd", "sds"));
+                break;
             default:
-//                log.info("Return echo message %s : %s", replyToken, text);
-                this.replyText(replyToken, text);
+                new ReplayController(lineMessagingClient).replyText(replyToken, text);
         }
     }
 
-    private void replyText(@NonNull String replyToken, @NonNull String message) {
-        if (replyToken.isEmpty()) {
-            throw new IllegalArgumentException("replyToken is not empty");
-        }
-
-        if (message.length() > 1000) {
-            message = message.substring(0, 1000 - 2) + "...";
-        }
-        this.reply(replyToken, new TextMessage(message));
-    }
-
-    private void reply(@NonNull String replyToken, @NonNull Message message) {
-        reply(replyToken, Collections.singletonList(message));
-    }
-
-    private void reply(@NonNull String replyToken, @NonNull List<Message> messages) {
-        try {
-            BotApiResponse response = lineMessagingClient.replyMessage(
-                    new ReplyMessage(replyToken, messages)
-            ).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     private void showProfile(String replyToken, Event event) {
         String userId = event.getSource().getUserId();
@@ -108,10 +72,10 @@ public class MainController {
             lineMessagingClient.getProfile(userId)
                     .whenComplete((profile, throwable) -> {
                         if (throwable != null) {
-                            this.replyText(replyToken, throwable.getMessage());
+                            new ReplayController(lineMessagingClient).replyText(replyToken, throwable.getMessage());
                             return;
                         }
-                        this.reply(replyToken, Arrays.asList(
+                        new ReplayController(lineMessagingClient).reply(replyToken, Arrays.asList(
                                 new TextMessage("Display name: " + profile.getDisplayName()),
                                 new TextMessage("Status message: " + profile.getStatusMessage()),
                                 new TextMessage("User ID: " + profile.getUserId())
@@ -120,29 +84,16 @@ public class MainController {
         }
     }
 
-    @EventMapping
-    public void handleImageMessage(MessageEvent<ImageMessageContent> event) {
-//        log.info(event.toString());
-        ImageMessageContent content = event.getMessage();
-        String replyToken = event.getReplyToken();
-
-        try {
-            MessageContentResponse response = lineMessagingClient.getMessageContent(
-                    content.getId()).get();
-            DownloadedContent jpg = saveContent("jpg", response);
-            DownloadedContent previewImage = createTempFile("jpg");
-
-            system("convert", "-resize", "240x",
-                    jpg.path.toString(),
-                    previewImage.path.toString());
-
-            reply(replyToken, new ImageMessage(jpg.getUri(), previewImage.getUri()));
-
-        } catch (InterruptedException | ExecutionException e) {
-            reply(replyToken, new TextMessage("Cannot get image: " + content));
-            throw new RuntimeException(e);
-        }
-
+    private void showQuestPokemon(String replyToken) {
+        QuestPokemonGo questPokemonGo = questPokemonGoService.findAll().get(0);
+        QuestPokemonGo jpg = saveContent(questPokemonGo);
+        QuestPokemonGo previewImage = createTempFile(questPokemonGo);
+        system("convert", "-resize", "240x",
+                jpg.getPath(),
+                previewImage.getPath());
+        System.out.println("url : " + questPokemonGo.getUrl());
+        System.out.println("Path : " + questPokemonGo.getPath());
+        new ReplayController(lineMessagingClient).reply(replyToken, new ImageMessage(questPokemonGo.getUrl(), questPokemonGo.getUrl()));
     }
 
     private void system(String... args) {
@@ -150,36 +101,29 @@ public class MainController {
         try {
             Process start = processBuilder.start();
             int i = start.waitFor();
-//            log.info("result: {} => {}", Arrays.toString(args), i);
         } catch (InterruptedException e) {
-//            log.info("Interrupted", e);
             Thread.currentThread().interrupt();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    private static DownloadedContent saveContent(String ext,
-                                                 MessageContentResponse response) {
-//        log.info("Content-type: {}", response);
-        DownloadedContent tempFile = createTempFile(ext);
-        try (OutputStream outputStream = Files.newOutputStream(tempFile.path)) {
-            ByteStreams.copy(response.getStream(), outputStream);
-//            log.info("Save {}: {}", ext, tempFile);
+    private static QuestPokemonGo saveContent(QuestPokemonGo questPokemonGo){
+        QuestPokemonGo tempFile = createTempFile(questPokemonGo);
+        try (OutputStream outputStream = Files.newOutputStream(Paths.get(questPokemonGo.getPath()))) {
+            ByteStreams.copy(new BufferedInputStream(new FileInputStream(questPokemonGo.getPath())), outputStream);
             return tempFile;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    private static DownloadedContent createTempFile(String ext) {
-        String fileName = LocalDateTime.now() + "-"
-                + UUID.randomUUID().toString()
-                + "." + ext;
-        Path tempFile = Application.downloadedContentDir.resolve(fileName);
+    private static QuestPokemonGo createTempFile(QuestPokemonGo questPokemonGo) {
+        String fileName = "downloadsquest"
+                + ".jpg";
+        Path tempFile = Paths.get(properties.getLocation() + "/" + fileName);
         tempFile.toFile().deleteOnExit();
-        return new DownloadedContent(tempFile,
-                createUri("/downloaded/" + tempFile.getFileName()));
+        return new QuestPokemonGo(tempFile.toString(), createUri(questPokemonGo.getPath()));
 
     }
 
@@ -187,9 +131,5 @@ public class MainController {
         return ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(path).toUriString();
     }
-
-    public static class DownloadedContent {
-        Path path;
-        String uri;
-    }
 }
+

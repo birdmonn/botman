@@ -1,7 +1,7 @@
 package com.sapo.botman.storage;
 
-import com.adss.rif.utils.MessageUtils;
-import com.adss.rif.utils.SplitString;
+import com.sapo.botman.utils.MessageUtils;
+import com.sapo.botman.utils.SplitString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,22 +33,19 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public String store(MultipartFile file, String stringPath) {
-        String fileName = String.valueOf(new Date().getTime()) + "."
-                + com.google.common.io.Files.getFileExtension(StringUtils.cleanPath(file.getOriginalFilename()));
+    public String store(InputStream file, String stringPath) {
+        String fileName = "downloadsquest.jpg";
         try {
-            if (file.isEmpty()) {
-                throw new StorageException(MessageUtils.FAILED_TO_STORE_FILE + fileName);
-            }
             if (fileName.contains("..")) {
                 // This is a security check
                 throw new StorageException(MessageUtils.CANNOT_STORE_FILE
                         + fileName);
             }
-            Path customPath = Paths.get(properties.getLocationReport() + stringPath);
-            Files.createDirectories(customPath);
-            Files.copy(file.getInputStream(), customPath.resolve(fileName),
+            Path customPath = Paths.get(properties.getLocation());
+//            Files.createDirectories(customPath);
+            Files.copy(file, customPath.resolve(fileName),
                     StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("in store");
             return "/" + properties.getLocationReport() + stringPath + fileName;
         } catch (IOException e) {
             throw new StorageException(MessageUtils.FAILED_TO_STORE_FILE + fileName, e);
@@ -67,16 +65,15 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public Path load(String pathId, String filename) {
-
-        Path customPath = Paths.get(properties.getLocationReport() + "/" + pathId);
+    public Path load(String filename) {
+        Path customPath = Paths.get(properties.getLocation());
         return customPath.resolve(filename);
     }
 
     @Override
-    public Resource loadAsResource(String pathId, String fileName) {
+    public Resource loadAsResource(String fileName) {
         try {
-            Path file = load(pathId, fileName);
+            Path file = load(fileName);
             Resource resource = new UrlResource(file.toUri());
             if (resource.exists() || resource.isReadable()) {
                 return resource;
