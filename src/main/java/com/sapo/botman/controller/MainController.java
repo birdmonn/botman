@@ -74,7 +74,7 @@ public class MainController {
     public void handleStickerMessage(MessageEvent<StickerMessageContent> event) {
         StickerMessageContent message = event.getMessage();
         if (!event.getSource().getSenderId().equals(ConfigGroup.GROUPID)) {
-            reply(event.getReplyToken(), new StickerMessage(
+            new ReplayController(lineMessagingClient).reply(event.getReplyToken(), new StickerMessage(
                     message.getPackageId(), message.getStickerId()
             ));
         }
@@ -87,33 +87,11 @@ public class MainController {
                 showProfile(replyToken, event);
                 break;
             default:
-                this.replyText(replyToken, text);
+                new ReplayController(lineMessagingClient).replyText(replyToken, text);
         }
     }
 
-    private void replyText(@NonNull String replyToken, @NonNull String message) {
-        if (replyToken.isEmpty()) {
-            throw new IllegalArgumentException("replyToken is not empty");
-        }
-        if (message.length() > 1000) {
-            message = message.substring(0, 1000 - 2) + "...";
-        }
-        this.reply(replyToken, new TextMessage(message));
-    }
 
-    private void reply(@NonNull String replyToken, @NonNull Message message) {
-        reply(replyToken, Collections.singletonList(message));
-    }
-
-    private void reply(@NonNull String replyToken, @NonNull List<Message> messages) {
-        try {
-            BotApiResponse response = lineMessagingClient.replyMessage(
-                    new ReplyMessage(replyToken, messages)
-            ).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     private void showProfile(String replyToken, Event event) {
         String userId = event.getSource().getUserId();
@@ -121,10 +99,10 @@ public class MainController {
             lineMessagingClient.getProfile(userId)
                     .whenComplete((profile, throwable) -> {
                         if (throwable != null) {
-                            this.replyText(replyToken, throwable.getMessage());
+                            new ReplayController(lineMessagingClient).replyText(replyToken, throwable.getMessage());
                             return;
                         }
-                        this.reply(replyToken, Arrays.asList(
+                        new ReplayController(lineMessagingClient).reply(replyToken, Arrays.asList(
                                 new TextMessage("Display name: " + profile.getDisplayName()),
                                 new TextMessage("Status message: " + profile.getStatusMessage()),
                                 new TextMessage("User ID: " + profile.getUserId())
@@ -133,78 +111,29 @@ public class MainController {
         }
     }
 
-    @EventMapping
-    public void handleImageMessage(MessageEvent<ImageMessageContent> event) {
-//        log.info(event.toString());
-        ImageMessageContent content = event.getMessage();
-        String replyToken = event.getReplyToken();
-
-        try {
-            MessageContentResponse response = lineMessagingClient.getMessageContent(
-                    content.getId()).get();
-            QuestPokemonGo jpg = saveContent("jpg", response);
-            QuestPokemonGo previewImage = createTempFile("jpg");
-            saveImageToDb(jpg);
-            system("convert", "-resize", "240x",
-                    jpg.getPath(),
-                    previewImage.getPath());
-
-            reply(replyToken, new ImageMessage(jpg.getUrl(), previewImage.getUrl()));
-
-        } catch (InterruptedException | ExecutionException e) {
-            reply(replyToken, new TextMessage("Cannot get image: " + content));
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    private void system(String... args) {
-        ProcessBuilder processBuilder = new ProcessBuilder(args);
-        try {
-            Process start = processBuilder.start();
-            int i = start.waitFor();
-//            log.info("result: {} => {}", Arrays.toString(args), i);
-        } catch (InterruptedException e) {
-//            log.info("Interrupted", e);
-            Thread.currentThread().interrupt();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    private QuestPokemonGo saveContent(String ext,
-                                       MessageContentResponse response) {
-        QuestPokemonGo tempFile = createTempFile(ext);
-        try (OutputStream outputStream = Files.newOutputStream(Paths.get(tempFile.getPath()))) {
-            ByteStreams.copy(response.getStream(), outputStream);
-            storageService.store(response.getStream(),"");
-            System.out.println("save image");
-            return tempFile;
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    private QuestPokemonGo createTempFile(String ext) {
-        String fileName = "downloadsquest"
-                + "." + ext;
-        Path tempFile = Paths.get(properties.getLocation()+"/"+fileName);
-//        tempFile.toFile().deleteOnExit();
-        return new QuestPokemonGo(tempFile.toString(),
-                createUri("/downloads/" + tempFile.getFileName()));
-    }
-
-    private static String createUri(String path) {
-        return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(path).toUriString();
-    }
-
-    private void saveImageToDb(QuestPokemonGo newImage) {
-        List<QuestPokemonGo> questPokemonGoList = questPokemonGoService.findAll();
-        questPokemonGoList.get(0).setPath(newImage.getPath());
-        questPokemonGoList.get(0).setUrl(newImage.getUrl());
-        questPokemonGoList.get(0).setUpload(false);
-        questPokemonGoService.update(questPokemonGoList.get(0).getId(), questPokemonGoList.get(0));
-    }
+//    @EventMapping
+//    public void handleImageMessage(MessageEvent<ImageMessageContent> event) {
+////        log.info(event.toString());
+//        ImageMessageContent content = event.getMessage();
+//        String replyToken = event.getReplyToken();
+//
+//        try {
+//            MessageContentResponse response = lineMessagingClient.getMessageContent(
+//                    content.getId()).get();
+//            QuestPokemonGo jpg = saveContent("jpg", response);
+//            QuestPokemonGo previewImage = createTempFile("jpg");
+//            saveImageToDb(jpg);
+//            system("convert", "-resize", "240x",
+//                    jpg.getPath(),
+//                    previewImage.getPath());
+//
+//            reply(replyToken, new ImageMessage(jpg.getUrl(), previewImage.getUrl()));
+//
+//        } catch (InterruptedException | ExecutionException e) {
+//            reply(replyToken, new TextMessage("Cannot get image: " + content));
+//            throw new RuntimeException(e);
+//        }
+//
+//    }
 }
 
