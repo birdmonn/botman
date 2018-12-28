@@ -15,9 +15,7 @@ import com.sapo.botman.service.QuestPokemonGoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -118,10 +116,10 @@ public class MainController {
         }
     }
 //
-    private static QuestPokemonGo saveContent(QuestPokemonGo questPokemonGo) {
+    private static QuestPokemonGo saveContent(QuestPokemonGo questPokemonGo) throws FileNotFoundException {
         QuestPokemonGo tempFile = createTempFile(questPokemonGo);
         try (OutputStream outputStream = Files.newOutputStream(Paths.get(questPokemonGo.getPath()))) {
-//            ByteStreams.copy(response.getStream(), outputStream);
+            ByteStreams.copy(new BufferedInputStream(new FileInputStream(questPokemonGo.getPath())), outputStream);
 //            log.info("Save {}: {}", ext, tempFile);
             return tempFile;
         } catch (IOException e) {
