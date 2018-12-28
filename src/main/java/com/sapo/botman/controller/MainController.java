@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.UUID;
@@ -95,57 +96,55 @@ public class MainController {
 
     private void showQuestPokemon(String replyToken) {
         QuestPokemonGo questPokemonGo = questPokemonGoService.findAll().get(0);
-//        try {
-//            QuestPokemonGo jpg = saveContent("jpg", response);
-//            QuestPokemonGo previewImage = createTempFile("jpg");
-//            system("convert", "-resize", "240x",
-//                    jpg.getPath(),
-//                    previewImage.getPath());
+        try {
+            QuestPokemonGo jpg = saveContent(questPokemonGo, response);
+            QuestPokemonGo previewImage = createTempFile("jpg");
+            system("convert", "-resize", "240x",
+                    jpg.getPath(),
+                    previewImage.getPath());
             System.out.println("url : " + questPokemonGo.getUrl());
         System.out.println("Path : " + questPokemonGo.getPath());
             new ReplayController(lineMessagingClient).reply(replyToken, new ImageMessage(questPokemonGo.getUrl(), questPokemonGo.getUrl()));
 
-//        } catch (InterruptedException | ExecutionException e) {
-//            new ReplayController(lineMessagingClient).reply(replyToken, new TextMessage("Cannot get image"));
-//            throw new RuntimeException(e);
-//        }
+        } catch (InterruptedException | ExecutionException e) {
+            new ReplayController(lineMessagingClient).reply(replyToken, new TextMessage("Cannot get image"));
+            throw new RuntimeException(e);
+        }
     }
-//    private void system(String... args) {
-//        ProcessBuilder processBuilder = new ProcessBuilder(args);
-//        try {
-//            Process start = processBuilder.start();
-//            int i = start.waitFor();
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//        } catch (IOException e) {
-//            throw new UncheckedIOException(e);
-//        }
-//    }
+    private void system(String... args) {
+        ProcessBuilder processBuilder = new ProcessBuilder(args);
+        try {
+            Process start = processBuilder.start();
+            int i = start.waitFor();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 //
-//    private static DownloadedContent saveContent(String ext, MessageContentResponse response) {
-//        log.info("Content-type: {}", response);
-//        DownloadedContent tempFile = createTempFile(ext);
-//        try (OutputStream outputStream = Files.newOutputStream(tempFile.path)) {
+    private static QuestPokemonGo saveContent(QuestPokemonGo questPokemonGo) {
+        QuestPokemonGo tempFile = createTempFile(questPokemonGo);
+        try (OutputStream outputStream = Files.newOutputStream(Paths.get(questPokemonGo.getPath()))) {
 //            ByteStreams.copy(response.getStream(), outputStream);
 //            log.info("Save {}: {}", ext, tempFile);
-//            return tempFile;
-//        } catch (IOException e) {
-//            throw new UncheckedIOException(e);
-//        }
-//    }
+            return tempFile;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 //
-//    private static DownloadedContent createTempFile(String ext) {
-//        String fileName = LocalDateTime.now() + "-" + UUID.randomUUID().toString() + "." + ext;
-//        Path tempFile = Application.downloadedContentDir.resolve(fileName);
-//        tempFile.toFile().deleteOnExit();
-//        return new DownloadedContent(tempFile, createUri("/downloaded/" + tempFile.getFileName()));
+    private static QuestPokemonGo createTempFile(QuestPokemonGo questPokemonGo) {
+        Path tempFile = Paths.get(questPokemonGo.getPath());
+        tempFile.toFile().deleteOnExit();
+        return new QuestPokemonGo(tempFile.toString(), createUri(questPokemonGo.getPath()));
+
+    }
 //
-//    }
-//
-//    private static String createUri(String path) {
-//        return ServletUriComponentsBuilder.fromCurrentContextPath()
-//                .path(path).toUriString();
-//    }
+    private static String createUri(String path) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path(path).toUriString();
+    }
 //    @EventMapping
 //    public void handleImageMessage(MessageEvent<ImageMessageContent> event) {
 ////        log.info(event.toString());
