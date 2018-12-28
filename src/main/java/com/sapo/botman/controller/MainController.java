@@ -12,6 +12,7 @@ import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import com.sapo.botman.model.QuestPokemonGo;
 import com.sapo.botman.service.QuestPokemonGoService;
+import com.sapo.botman.storage.StorageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -27,14 +28,18 @@ import java.util.concurrent.ExecutionException;
 @LineMessageHandler
 public class MainController {
 
+    private static StorageProperties properties;
     private LineMessagingClient lineMessagingClient;
     private QuestPokemonGoService questPokemonGoService;
+//    private StorageProperties properties;
 
     @Autowired
     public MainController(LineMessagingClient lineMessagingClient,
+                          StorageProperties properties,
                           QuestPokemonGoService questPokemonGoService) {
         this.lineMessagingClient = lineMessagingClient;
         this.questPokemonGoService = questPokemonGoService;
+        this.properties = properties;
     }
 
     @EventMapping
@@ -137,7 +142,10 @@ public class MainController {
 
     //
     private static QuestPokemonGo createTempFile(QuestPokemonGo questPokemonGo) {
-        Path tempFile = Paths.get(questPokemonGo.getPath());
+//        Path tempFile = Paths.get(questPokemonGo.getPath());
+        String fileName = "downloadsquest"
+                + ".jpg";
+        Path tempFile = Paths.get(properties.getLocation()+"/"+fileName);
         tempFile.toFile().deleteOnExit();
         return new QuestPokemonGo(tempFile.toString(), createUri(questPokemonGo.getPath()));
 
