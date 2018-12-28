@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutionException;
 public class ReplayController {
     private LineMessagingClient lineMessagingClient;
 
-    public ReplayController(LineMessagingClient lineMessagingClient) {
+    ReplayController(LineMessagingClient lineMessagingClient) {
         this.lineMessagingClient = lineMessagingClient;
     }
 

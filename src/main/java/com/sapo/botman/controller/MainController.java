@@ -68,6 +68,9 @@ public class MainController {
             case "#quest":
                 showQuestPokemon(replyToken);
                 break;
+            case "#quest2":
+                new ReplayController(lineMessagingClient).reply(replyToken, new ImageMessage("asd", "sds"));
+                break;
             default:
                 new ReplayController(lineMessagingClient).replyText(replyToken, text);
         }
