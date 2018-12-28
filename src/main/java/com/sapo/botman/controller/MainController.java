@@ -1,6 +1,8 @@
 package com.sapo.botman.controller;
 
+import com.google.common.io.ByteStreams;
 import com.linecorp.bot.client.LineMessagingClient;
+import com.linecorp.bot.client.MessageContentResponse;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
@@ -11,8 +13,17 @@ import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import com.sapo.botman.model.QuestPokemonGo;
 import com.sapo.botman.service.QuestPokemonGoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 @LineMessageHandler
 public class MainController {
@@ -84,8 +95,57 @@ public class MainController {
 
     private void showQuestPokemon(String replyToken) {
         QuestPokemonGo questPokemonGo = questPokemonGoService.findAll().get(0);
-        new ReplayController(lineMessagingClient).reply(replyToken, new ImageMessage(questPokemonGo.getUrl(), questPokemonGo.getUrl()));
+//        try {
+//            QuestPokemonGo jpg = saveContent("jpg", response);
+//            QuestPokemonGo previewImage = createTempFile("jpg");
+//            system("convert", "-resize", "240x",
+//                    jpg.getPath(),
+//                    previewImage.getPath());
+            System.out.println("url : " + questPokemonGo.getUrl());
+        System.out.println("Path : " + questPokemonGo.getPath());
+            new ReplayController(lineMessagingClient).reply(replyToken, new ImageMessage(questPokemonGo.getUrl(), questPokemonGo.getUrl()));
+
+//        } catch (InterruptedException | ExecutionException e) {
+//            new ReplayController(lineMessagingClient).reply(replyToken, new TextMessage("Cannot get image"));
+//            throw new RuntimeException(e);
+//        }
     }
+//    private void system(String... args) {
+//        ProcessBuilder processBuilder = new ProcessBuilder(args);
+//        try {
+//            Process start = processBuilder.start();
+//            int i = start.waitFor();
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//        } catch (IOException e) {
+//            throw new UncheckedIOException(e);
+//        }
+//    }
+//
+//    private static DownloadedContent saveContent(String ext, MessageContentResponse response) {
+//        log.info("Content-type: {}", response);
+//        DownloadedContent tempFile = createTempFile(ext);
+//        try (OutputStream outputStream = Files.newOutputStream(tempFile.path)) {
+//            ByteStreams.copy(response.getStream(), outputStream);
+//            log.info("Save {}: {}", ext, tempFile);
+//            return tempFile;
+//        } catch (IOException e) {
+//            throw new UncheckedIOException(e);
+//        }
+//    }
+//
+//    private static DownloadedContent createTempFile(String ext) {
+//        String fileName = LocalDateTime.now() + "-" + UUID.randomUUID().toString() + "." + ext;
+//        Path tempFile = Application.downloadedContentDir.resolve(fileName);
+//        tempFile.toFile().deleteOnExit();
+//        return new DownloadedContent(tempFile, createUri("/downloaded/" + tempFile.getFileName()));
+//
+//    }
+//
+//    private static String createUri(String path) {
+//        return ServletUriComponentsBuilder.fromCurrentContextPath()
+//                .path(path).toUriString();
+//    }
 //    @EventMapping
 //    public void handleImageMessage(MessageEvent<ImageMessageContent> event) {
 ////        log.info(event.toString());
