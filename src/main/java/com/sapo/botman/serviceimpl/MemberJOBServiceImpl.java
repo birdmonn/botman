@@ -54,6 +54,16 @@ public class MemberJOBServiceImpl implements MemberJOBService {
     }
 
     @Override
+    public String getMemberList() {
+        List<MemberJOB> memList= this.findAll();
+        String replay = "รายชื่อทั้งหมด\n";
+        for (int i =0; i>memList.size();i++) {
+            replay += (i+1)+". "+memList.get(i)+"\n";
+        }
+        return replay;
+    }
+
+    @Override
     public void deleteById(Long id) {
         memberJOBRepository.deleteById(id);
     }

@@ -1,6 +1,5 @@
 package com.sapo.botman.controller;
 
-import com.google.common.io.ByteStreams;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
@@ -10,7 +9,6 @@ import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import com.sapo.botman.model.MemberJOB;
-import com.sapo.botman.model.QuestPokemonGo;
 import com.sapo.botman.service.MemberJOBService;
 import com.sapo.botman.service.QuestPokemonGoService;
 import com.sapo.botman.utils.SplitString;
@@ -18,16 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 @LineMessageHandler
 public class MainController {
 
     private LineMessagingClient lineMessagingClient;
-    private QuestPokemonGoService questPokemonGoService;
     private MemberJOBService memberJOBService;
     @Autowired
     public MainController(LineMessagingClient lineMessagingClient,
@@ -55,8 +49,8 @@ public class MainController {
             case "Profile":
                 showProfile(replyToken, event);
                 break;
-            case "#quest":
-//                showQuestPokemon(replyToken);
+            case "#listmember":
+                this.listMember(replyToken);
                 break;
             case "#quest2":
                 new ReplayController(lineMessagingClient).reply(replyToken, new ImageMessage("asd", "sds"));
@@ -111,7 +105,7 @@ public class MainController {
                 .path(path).toUriString();
     }
 
-    private  void regiMember(String[] content,Event event,String replyToken){
+    private void regiMember(String[] content,Event event,String replyToken){
         if(content.length >= 2) {
             String userId = event.getSource().getUserId();
             String msgReplay = memberJOBService.regiMember(new MemberJOB(userId, content[1]));
@@ -119,6 +113,11 @@ public class MainController {
         } {
             new ReplayController(lineMessagingClient).replyText(replyToken, "command fail");
         }
+    }
+
+    private void listMember(String replyToken){
+           String msgReplay = memberJOBService.getMemberList();
+           new ReplayController(lineMessagingClient).replyText(replyToken, msgReplay);
     }
 }
 
