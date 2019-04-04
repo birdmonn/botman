@@ -13,7 +13,6 @@ import com.sapo.botman.model.MemberJOB;
 import com.sapo.botman.model.QuestPokemonGo;
 import com.sapo.botman.service.MemberJOBService;
 import com.sapo.botman.service.QuestPokemonGoService;
-import com.sapo.botman.storage.StorageProperties;
 import com.sapo.botman.utils.SplitString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -27,19 +26,16 @@ import java.util.Arrays;
 @LineMessageHandler
 public class MainController {
 
-    private static StorageProperties properties;
     private LineMessagingClient lineMessagingClient;
     private QuestPokemonGoService questPokemonGoService;
     private MemberJOBService memberJOBService;
     @Autowired
     public MainController(LineMessagingClient lineMessagingClient,
-                          StorageProperties properties,
                           QuestPokemonGoService questPokemonGoService,
                           MemberJOBService memberJOBService) {
         this.lineMessagingClient = lineMessagingClient;
         this.questPokemonGoService = questPokemonGoService;
         this.memberJOBService = memberJOBService;
-        this.properties = properties;
     }
 
     @EventMapping
@@ -60,7 +56,7 @@ public class MainController {
                 showProfile(replyToken, event);
                 break;
             case "#quest":
-                showQuestPokemon(replyToken);
+//                showQuestPokemon(replyToken);
                 break;
             case "#quest2":
                 new ReplayController(lineMessagingClient).reply(replyToken, new ImageMessage("asd", "sds"));
@@ -92,17 +88,7 @@ public class MainController {
         }
     }
 
-    private void showQuestPokemon(String replyToken) {
-        QuestPokemonGo questPokemonGo = questPokemonGoService.findAll().get(0);
-        QuestPokemonGo jpg = saveContent(questPokemonGo);
-        QuestPokemonGo previewImage = createTempFile(questPokemonGo);
-        system("convert", "-resize", "240x",
-                jpg.getPath(),
-                previewImage.getPath());
-        System.out.println("url : " + questPokemonGo.getUrl());
-        System.out.println("Path : " + questPokemonGo.getPath());
-        new ReplayController(lineMessagingClient).reply(replyToken, new ImageMessage(questPokemonGo.getUrl(), questPokemonGo.getUrl()));
-    }
+
 
     private void system(String... args) {
         ProcessBuilder processBuilder = new ProcessBuilder(args);
@@ -116,24 +102,9 @@ public class MainController {
         }
     }
 
-    private static QuestPokemonGo saveContent(QuestPokemonGo questPokemonGo){
-        QuestPokemonGo tempFile = createTempFile(questPokemonGo);
-        try (OutputStream outputStream = Files.newOutputStream(Paths.get(questPokemonGo.getPath()))) {
-            ByteStreams.copy(new BufferedInputStream(new FileInputStream(questPokemonGo.getPath())), outputStream);
-            return tempFile;
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
 
-    private static QuestPokemonGo createTempFile(QuestPokemonGo questPokemonGo) {
-        String fileName = "downloadsquest"
-                + ".jpg";
-        Path tempFile = Paths.get(properties.getLocation() + "/" + fileName);
-        tempFile.toFile().deleteOnExit();
-        return new QuestPokemonGo(tempFile.toString(), createUri(questPokemonGo.getPath()));
 
-    }
+
 
     private static String createUri(String path) {
         return ServletUriComponentsBuilder.fromCurrentContextPath()
