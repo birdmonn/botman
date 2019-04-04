@@ -7,8 +7,8 @@ import java.nio.file.Path;
 import java.util.Date;
 
 @Entity
-@Table(name = "member")
-public class Member {
+@Table(name = "memberJOB")
+public class MemberJOB {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
