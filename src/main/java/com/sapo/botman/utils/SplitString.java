@@ -14,4 +14,9 @@ public class SplitString {
         String[] partSplit = path.split("/");
         return "/" + partSplit[2] + "/" + partSplit[3];
     }
+
+
+    public String[] stringContent(String content) {
+        return content.split(" ");
+    }
 }

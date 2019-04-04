@@ -15,6 +15,8 @@ public interface MemberJOBService {
 
     MemberJOB update(Long id, MemberJOB memberJOB);
 
+    String regiMember (MemberJOB memberJOB);
+
     void deleteById(Long id);
 
 }

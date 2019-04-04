@@ -9,9 +9,12 @@ import com.linecorp.bot.model.message.ImageMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
+import com.sapo.botman.model.MemberJOB;
 import com.sapo.botman.model.QuestPokemonGo;
+import com.sapo.botman.service.MemberJOBService;
 import com.sapo.botman.service.QuestPokemonGoService;
 import com.sapo.botman.storage.StorageProperties;
+import com.sapo.botman.utils.SplitString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -27,13 +30,15 @@ public class MainController {
     private static StorageProperties properties;
     private LineMessagingClient lineMessagingClient;
     private QuestPokemonGoService questPokemonGoService;
-
+    private MemberJOBService memberJOBService;
     @Autowired
     public MainController(LineMessagingClient lineMessagingClient,
                           StorageProperties properties,
-                          QuestPokemonGoService questPokemonGoService) {
+                          QuestPokemonGoService questPokemonGoService,
+                          MemberJOBService memberJOBService) {
         this.lineMessagingClient = lineMessagingClient;
         this.questPokemonGoService = questPokemonGoService;
+        this.memberJOBService = memberJOBService;
         this.properties = properties;
     }
 
@@ -49,8 +54,8 @@ public class MainController {
     }
 
     private void handleTextContent(String replyToken, Event event, TextMessageContent content) {
-        String text = content.getText();
-        switch (text) {
+        String[] text = SplitString.getInstance().stringContent(content.getText());
+        switch (text[0]) {
             case "Profile":
                 showProfile(replyToken, event);
                 break;
@@ -60,8 +65,11 @@ public class MainController {
             case "#quest2":
                 new ReplayController(lineMessagingClient).reply(replyToken, new ImageMessage("asd", "sds"));
                 break;
+            case "#regi":
+                this.regiMember(text,event,replyToken);
+                break;
             default:
-                new ReplayController(lineMessagingClient).replyText(replyToken, text);
+//                new ReplayController(lineMessagingClient).replyText(replyToken, text);
         }
     }
 
@@ -130,6 +138,16 @@ public class MainController {
     private static String createUri(String path) {
         return ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(path).toUriString();
+    }
+
+    private  void regiMember(String[] content,Event event,String replyToken){
+        if(content.length > 2) {
+            String userId = event.getSource().getUserId();
+            String msgReplay = memberJOBService.regiMember(new MemberJOB(userId, content[1]));
+            new ReplayController(lineMessagingClient).replyText(replyToken, msgReplay);
+        } {
+            new ReplayController(lineMessagingClient).replyText(replyToken, "command fail");
+        }
     }
 }
 

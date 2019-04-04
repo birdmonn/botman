@@ -40,6 +40,20 @@ public class MemberJOBServiceImpl implements MemberJOBService {
     }
 
     @Override
+    public String regiMember(MemberJOB memberJOB) {
+        MemberJOB findMember = memberJOBRepository.findByUserId(memberJOB.getUserId());
+        if(findMember == null){
+            return "คุณได้ลงทะเบียนแล้ว";
+        }
+        MemberJOB memberRegi = create(memberJOB);
+        if (memberRegi != null){
+            return "ลงทะเบียนเรียบร้อย";
+        } else {
+            return "เกิดข้อผิดพลากรุณาติดต่อผู้ดูแล";
+        }
+    }
+
+    @Override
     public void deleteById(Long id) {
         memberJOBRepository.deleteById(id);
     }

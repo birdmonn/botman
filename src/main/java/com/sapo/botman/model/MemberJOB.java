@@ -22,6 +22,14 @@ public class MemberJOB {
     @Temporal(TemporalType.TIMESTAMP)
     private Date modified;
 
+    public MemberJOB() {
+    }
+
+    public MemberJOB(String userId, String name) {
+        this.userId = userId;
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }
