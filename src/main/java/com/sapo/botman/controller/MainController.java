@@ -28,7 +28,6 @@ public class MainController {
                           QuestPokemonGoService questPokemonGoService,
                           MemberJOBService memberJOBService) {
         this.lineMessagingClient = lineMessagingClient;
-        this.questPokemonGoService = questPokemonGoService;
         this.memberJOBService = memberJOBService;
     }
 

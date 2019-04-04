@@ -56,11 +56,11 @@ public class MemberJOBServiceImpl implements MemberJOBService {
     @Override
     public String getMemberList() {
         List<MemberJOB> memList= this.findAll();
-        String replay = "รายชื่อทั้งหมด\n";
-        for (int i =0; i>memList.size();i++) {
-            replay += (i+1)+". "+memList.get(i)+"\n";
+        StringBuilder replay = new StringBuilder("รายชื่อทั้งหมด\n");
+        for (int i =0; i<memList.size();i++) {
+            replay.append(i + 1).append(". ").append(memList.get(i).getName()).append("\n");
         }
-        return replay;
+        return replay.toString();
     }
 
     @Override
