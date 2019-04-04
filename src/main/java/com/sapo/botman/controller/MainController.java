@@ -112,7 +112,7 @@ public class MainController {
     }
 
     private  void regiMember(String[] content,Event event,String replyToken){
-        if(content.length > 2) {
+        if(content.length >= 2) {
             String userId = event.getSource().getUserId();
             String msgReplay = memberJOBService.regiMember(new MemberJOB(userId, content[1]));
             new ReplayController(lineMessagingClient).replyText(replyToken, msgReplay);
