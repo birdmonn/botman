@@ -4,6 +4,7 @@ import com.sapo.botman.model.QuestPokemonGo;
 
 import java.util.List;
 
+
 public interface QuestPokemonGoService {
 
     List<QuestPokemonGo> findAll();

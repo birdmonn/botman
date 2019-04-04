@@ -1,6 +1,5 @@
 package com.sapo.botman;
 
-import com.sapo.botman.model.QuestPokemonGo;
 import com.sapo.botman.service.QuestPokemonGoService;
 import com.sapo.botman.storage.StorageProperties;
 import com.sapo.botman.storage.StorageService;

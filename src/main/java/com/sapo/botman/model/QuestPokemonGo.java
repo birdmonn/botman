@@ -3,7 +3,6 @@ package com.sapo.botman.model;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.nio.file.Path;
 import java.util.Date;
 
 @Entity

@@ -1,6 +1,5 @@
 package com.sapo.botman.controller;
 
-import com.sapo.botman.model.QuestPokemonGo;
 import com.sapo.botman.service.QuestPokemonGoService;
 import com.sapo.botman.storage.StorageFileNotFoundException;
 import com.sapo.botman.storage.StorageService;
@@ -9,11 +8,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class FileUploadController {
