@@ -43,4 +43,5 @@ dependencies {
 	compile group: 'com.linecorp.bot', name: 'line-bot-cli', version: '2.3.0'
 	compile('org.postgresql:postgresql')
 	compile 'org.projectlombok:lombok'
+
 }
