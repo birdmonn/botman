@@ -42,7 +42,7 @@ public class MemberJOBServiceImpl implements MemberJOBService {
     @Override
     public String regiMember(MemberJOB memberJOB) {
         MemberJOB findMember = memberJOBRepository.findByUserId(memberJOB.getUserId());
-        if(findMember == null){
+        if(findMember != null){
             return "คุณได้ลงทะเบียนแล้ว";
         }
         MemberJOB memberRegi = create(memberJOB);
