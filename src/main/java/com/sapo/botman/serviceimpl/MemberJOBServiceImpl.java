@@ -68,5 +68,8 @@ public class MemberJOBServiceImpl implements MemberJOBService {
         memberJOBRepository.deleteById(id);
     }
 
-
+    @Override
+    public MemberJOB findByName(String name) {
+        return memberJOBRepository.findByName(name);
+    }
 }

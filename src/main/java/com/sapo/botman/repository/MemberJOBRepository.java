@@ -10,4 +10,7 @@ public interface MemberJOBRepository extends JpaRepository<MemberJOB, Long> {
 
     @Query("SELECT mj FROM MemberJOB mj WHERE mj.userId = ?1 ")
     MemberJOB findByUserId(String userId);
+
+    @Query("SELECT mj FROM MemberJOB mj WHERE mj.name = ?1 ")
+    MemberJOB findByName(String name);
 }

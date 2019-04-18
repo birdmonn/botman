@@ -2,7 +2,6 @@ package com.sapo.botman.service;
 
 
 import com.sapo.botman.model.LeaveMember;
-import com.sapo.botman.model.MemberJOB;
 
 import java.util.List;
 
@@ -12,7 +11,7 @@ public interface LeaveMemberService {
 
     LeaveMember findById(Long id);
 
-//    List<LeaveMember> findByMemberJOB(MemberJOB memberJOB);
+    String getLeaveList(Long memberJOBId);
 
     LeaveMember create(LeaveMember leaveMember);
 

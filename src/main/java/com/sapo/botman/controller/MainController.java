@@ -9,26 +9,29 @@ import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import com.sapo.botman.model.MemberJOB;
+import com.sapo.botman.service.LeaveMemberService;
 import com.sapo.botman.service.MemberJOBService;
 import com.sapo.botman.service.QuestPokemonGoService;
 import com.sapo.botman.utils.SplitString;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.*;
 import java.util.Arrays;
+import java.util.logging.Level;
 
 @LineMessageHandler
 public class MainController {
 
     private LineMessagingClient lineMessagingClient;
     private MemberJOBService memberJOBService;
+    private LeaveMemberService leaveMemberService;
     @Autowired
     public MainController(LineMessagingClient lineMessagingClient,
                           QuestPokemonGoService questPokemonGoService,
+                          LeaveMemberService leaveMemberService,
                           MemberJOBService memberJOBService) {
         this.lineMessagingClient = lineMessagingClient;
         this.memberJOBService = memberJOBService;
+        this.leaveMemberService = leaveMemberService;
     }
 
     @EventMapping
@@ -44,8 +47,8 @@ public class MainController {
 
     private void handleTextContent(String replyToken, Event event, TextMessageContent content) {
         String[] text = SplitString.getInstance().stringContent(content.getText());
-        switch (text[0]) {
-            case "Profile":
+        switch (text[0].toLowerCase()) {
+            case "profile":
                 showProfile(replyToken, event);
                 break;
             case "#listmember":
@@ -55,6 +58,12 @@ public class MainController {
                 new ReplayController(lineMessagingClient).reply(replyToken, new ImageMessage("asd", "sds"));
                 break;
             case "#regi":
+                this.regiMember(text,event,replyToken);
+                break;
+            case "#leave":
+                this.regiMember(text,event,replyToken);
+                break;
+            case "#leavedate":
                 this.regiMember(text,event,replyToken);
                 break;
             default:
@@ -81,35 +90,12 @@ public class MainController {
         }
     }
 
-
-
-    private void system(String... args) {
-        ProcessBuilder processBuilder = new ProcessBuilder(args);
-        try {
-            Process start = processBuilder.start();
-            int i = start.waitFor();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-
-
-
-
-    private static String createUri(String path) {
-        return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(path).toUriString();
-    }
-
     private void regiMember(String[] content,Event event,String replyToken){
         if(content.length >= 2) {
             String userId = event.getSource().getUserId();
             String msgReplay = memberJOBService.regiMember(new MemberJOB(userId, content[1]));
             new ReplayController(lineMessagingClient).replyText(replyToken, msgReplay);
-        } {
+        } else {
             new ReplayController(lineMessagingClient).replyText(replyToken, "command fail");
         }
     }
@@ -117,6 +103,20 @@ public class MainController {
     private void listMember(String replyToken){
            String msgReplay = memberJOBService.getMemberList();
            new ReplayController(lineMessagingClient).replyText(replyToken, msgReplay);
+    }
+
+    private void listLeaveMember(String[] content,Event event,String replyToken){
+        if(content.length == 2){
+            MemberJOB memberJOBFind = memberJOBService.findByName(content[1]);
+            if (memberJOBFind != null){
+                String msgReplay = leaveMemberService.getLeaveList(memberJOBFind.getId());
+                new ReplayController(lineMessagingClient).replyText(replyToken, msgReplay);
+            } else {
+                new ReplayController(lineMessagingClient).replyText(replyToken, "user not found");
+            }
+        } else {
+            new ReplayController(lineMessagingClient).replyText(replyToken, "command fail");
+        }
     }
 }
 

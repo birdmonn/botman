@@ -11,6 +11,8 @@ public interface MemberJOBService {
 
     MemberJOB findById(Long id);
 
+    MemberJOB findByName(String name);
+
     MemberJOB create(MemberJOB memberJOB);
 
     MemberJOB update(Long id, MemberJOB memberJOB);
