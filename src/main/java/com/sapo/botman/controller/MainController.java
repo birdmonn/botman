@@ -61,7 +61,7 @@ public class MainController {
                 this.regiMember(text,event,replyToken);
                 break;
             case "#leave":
-                this.regiMember(text,event,replyToken);
+                this.listLeaveMember(text,event,replyToken);
                 break;
             case "#leavedate":
                 this.regiMember(text,event,replyToken);
