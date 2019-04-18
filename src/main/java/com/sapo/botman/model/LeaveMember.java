@@ -14,6 +14,7 @@ public class LeaveMember {
     private Long id;
     @ManyToOne
     private MemberJOB memberJOB;
+    @Temporal(TemporalType.DATE)
     private Date dateLeave;
     private String typeLeave;
 

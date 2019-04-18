@@ -34,9 +34,9 @@ public class LeaveMemberServiceImpl implements LeaveMemberService {
     @Override
     public String getLeaveList(Long memberJOBId) {
         List<LeaveMember> leaveMemberList = leaveMemberRepository.findByMemberJOBId(memberJOBId);
-        StringBuilder replay = new StringBuilder("list leave count " + leaveMemberList.size() );
+        StringBuilder replay = new StringBuilder("list leave " + leaveMemberList.size()+" day \n");
         for (int i =0; i<leaveMemberList.size();i++) {
-            replay.append(i + 1).append(". ").append(leaveMemberList.get(i).getDateLeave()).append(leaveMemberList.get(i).getTypeLeave()).append("\n");
+            replay.append(i + 1).append(". ").append(leaveMemberList.get(i).getDateLeave()).append(" ").append(leaveMemberList.get(i).getTypeLeave()).append("\n");
         }
         return replay.toString();
     }
