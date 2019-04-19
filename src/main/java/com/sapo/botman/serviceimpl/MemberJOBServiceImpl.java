@@ -72,4 +72,9 @@ public class MemberJOBServiceImpl implements MemberJOBService {
     public MemberJOB findByName(String name) {
         return memberJOBRepository.findByName(name);
     }
+
+    @Override
+    public MemberJOB findByUserId(String userId) {
+        return memberJOBRepository.findByUserId(userId);
+    }
 }

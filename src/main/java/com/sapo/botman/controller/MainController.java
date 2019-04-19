@@ -13,9 +13,14 @@ import com.sapo.botman.service.LeaveMemberService;
 import com.sapo.botman.service.MemberJOBService;
 import com.sapo.botman.service.QuestPokemonGoService;
 import com.sapo.botman.utils.SplitString;
+import com.sapo.botman.utils.StringToDate;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 
 @LineMessageHandler
@@ -35,7 +40,7 @@ public class MainController {
     }
 
     @EventMapping
-    public void handleTextMessage(MessageEvent<TextMessageContent> event) {
+    public void handleTextMessage(MessageEvent<TextMessageContent> event) throws ParseException {
 //        log.info(event.toString());
         System.out.println("event Stick :" + event.toString());
         System.out.println("Source :" + event.getSource().toString());
@@ -45,7 +50,7 @@ public class MainController {
         handleTextContent(event.getReplyToken(), event, message);
     }
 
-    private void handleTextContent(String replyToken, Event event, TextMessageContent content) {
+    private void handleTextContent(String replyToken, Event event, TextMessageContent content) throws ParseException {
         String[] text = SplitString.getInstance().stringContent(content.getText());
         switch (text[0].toLowerCase()) {
             case "profile":
@@ -64,7 +69,7 @@ public class MainController {
                 this.listLeaveMember(text,event,replyToken);
                 break;
             case "#leavedate":
-                this.regiMember(text,event,replyToken);
+                this.memberLeaveDate(text,event,replyToken);
                 break;
             default:
 //                new ReplayController(lineMessagingClient).replyText(replyToken, text);
@@ -114,6 +119,26 @@ public class MainController {
             } else {
                 new ReplayController(lineMessagingClient).replyText(replyToken, "user not found");
             }
+        } else {
+            new ReplayController(lineMessagingClient).replyText(replyToken, "command fail");
+        }
+    }
+
+    private void memberLeaveDate(String[] content,Event event,String replyToken) throws ParseException {
+        if(content.length == 2 || content.length == 4){
+
+            List<Date> dateLeave ;
+            String msgReplay;
+            if(content.length == 2){
+                dateLeave = StringToDate.getInstance().dateA(content[1]);
+                msgReplay = leaveMemberService.createLeaveDate(event.getSource().getUserId(),dateLeave);
+                new ReplayController(lineMessagingClient).replyText(replyToken, msgReplay);
+            } else {
+                dateLeave = StringToDate.getInstance().dateAToDateB(content[1],content[3]);
+                msgReplay = leaveMemberService.createLeaveDate(event.getSource().getUserId(),dateLeave);
+                new ReplayController(lineMessagingClient).replyText(replyToken, msgReplay);
+            }
+
         } else {
             new ReplayController(lineMessagingClient).replyText(replyToken, "command fail");
         }

@@ -9,16 +9,20 @@ import com.sapo.botman.service.MemberJOBService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 
 @Service
 public class LeaveMemberServiceImpl implements LeaveMemberService {
     private LeaveMemberRepository leaveMemberRepository;
+    private MemberJOBService memberJOBService;
 
     @Autowired
-    public LeaveMemberServiceImpl(LeaveMemberRepository leaveMemberRepository) {
+    public LeaveMemberServiceImpl(LeaveMemberRepository leaveMemberRepository,
+                                  MemberJOBService memberJOBService) {
         this.leaveMemberRepository = leaveMemberRepository;
+        this.memberJOBService = memberJOBService;
     }
 
     @Override
@@ -36,7 +40,7 @@ public class LeaveMemberServiceImpl implements LeaveMemberService {
         List<LeaveMember> leaveMemberList = leaveMemberRepository.findByMemberJOBId(memberJOBId);
         StringBuilder replay = new StringBuilder("list leave " + leaveMemberList.size()+" day \n");
         for (int i =0; i<leaveMemberList.size();i++) {
-            replay.append(i + 1).append(". ").append(leaveMemberList.get(i).getDateLeave()).append(" ").append(leaveMemberList.get(i).getTypeLeave()).append("\n");
+            replay.append(i + 1).append(". ").append(leaveMemberList.get(i).getDateLeave()).append(" ").append("\n");
         }
         return replay.toString();
     }
@@ -60,5 +64,16 @@ public class LeaveMemberServiceImpl implements LeaveMemberService {
         leaveMemberRepository.deleteById(id);
     }
 
-
+    @Override
+    public String createLeaveDate(String userId, List<Date> dateLeave) {
+        MemberJOB userLeave = memberJOBService.findByUserId(userId);
+        if(userLeave != null) {
+            for (Date itemDateLeave : dateLeave) {
+                this.create(new LeaveMember(userLeave, itemDateLeave));
+            }
+            return  "save leave date ";
+        } else {
+            return "user not regi";
+        }
+    }
 }

@@ -26,6 +26,14 @@ public class LeaveMember {
     @Temporal(TemporalType.TIMESTAMP)
     private Date modified;
 
+    public LeaveMember() {
+    }
+
+    public LeaveMember(MemberJOB memberJOB, Date dateLeave) {
+        this.memberJOB = memberJOB;
+        this.dateLeave = dateLeave;
+    }
+
     public Long getId() {
         return id;
     }
