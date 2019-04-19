@@ -25,7 +25,7 @@ public class StringToDate {
           Date dateEnd = new SimpleDateFormat("dd/MM/yyyy").parse(dateB);
           Calendar c = Calendar.getInstance();
           Date tempDate = dateStart;
-          while (tempDate.compareTo(dateEnd) == 0) {
+          while (tempDate.compareTo(dateEnd) != 0) {
               c.setTime(tempDate);
               c.add(Calendar.DATE, 1);
               tempDate = c.getTime();
