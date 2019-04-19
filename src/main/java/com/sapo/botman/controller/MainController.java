@@ -17,11 +17,9 @@ import com.sapo.botman.utils.StringToDate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 
 @LineMessageHandler
 public class MainController {
@@ -70,6 +68,9 @@ public class MainController {
                 break;
             case "#leavedate":
                 this.memberLeaveDate(text,event,replyToken);
+                break;
+            case "#help":
+                this.help(replyToken);
                 break;
             default:
 //                new ReplayController(lineMessagingClient).replyText(replyToken, text);
@@ -142,6 +143,15 @@ public class MainController {
         } else {
             new ReplayController(lineMessagingClient).replyText(replyToken, "command fail");
         }
+    }
+    private void help(String replyToken){
+        new ReplayController(lineMessagingClient).reply(replyToken, Arrays.asList(
+                new TextMessage("ดูรายชื่อที่สมัคร : #listmember"),
+                new TextMessage("สมัครใช้ระบบ : #regi (name)"),
+                new TextMessage("บันทึกวันลา : #leavedate date"),
+                new TextMessage("บันทึกวันลา : #leavedate datefrom - dateto"),
+                new TextMessage("ดูวันลา : #leave (name)")
+        ));
     }
 }
 
